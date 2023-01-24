@@ -7,12 +7,12 @@ import ImagesApiService from './load-image';
 const formEl = document.querySelector('.search-form');
 const markupContainerEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more');
+const totalHitsContainerEl = document.querySelector('.total-hits')
 
 const imagesApiService = new ImagesApiService();
 let lightbox;
 
 function createMarkup(array) {
-
     return array.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => { 
         return `<a class="gallery-item" href='${largeImageURL}'>
         <div class="photo-card">
@@ -70,6 +70,7 @@ function handleImageLoad(event) {
             }  
         })
         .catch(() => {
+            loadMoreBtnEl.classList.add('is-hidden')
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
         })
     
