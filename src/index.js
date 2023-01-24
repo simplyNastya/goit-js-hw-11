@@ -9,10 +9,12 @@ const markupContainerEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more');
 
 const imagesApiService = new ImagesApiService();
+let lightbox;
 
 function createMarkup(array) {
+
     return array.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => { 
-        return `<a class="gallery-item" href='#' src=${largeImageURL}>
+        return `<a class="gallery-item" href='${largeImageURL}'>
         <div class="photo-card">
         <img src="${webformatURL}" alt="${tags}" loading="lazy" width=370px height=294px/>
         <div class="info">
@@ -38,6 +40,10 @@ function appendMarkup(array) {
     const markup = createMarkup(array)
     
     markupContainerEl.insertAdjacentHTML('beforeend', markup)
+
+    lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', 
+captionDelay: 250, })
+
 }
 
 function clearMarkup() {
@@ -60,6 +66,7 @@ function handleImageLoad(event) {
             } else {
                 clearMarkup()
                 appendMarkup(hits)
+                lightbox.refresh()
             }  
         })
         .catch(() => {
@@ -67,24 +74,18 @@ function handleImageLoad(event) {
         })
     
     loadMoreBtnEl.classList.remove('is-hidden')
-
-    // lightbox.refresh()
 }
 
 function handleOnLoadMore() {
     imagesApiService.makeFetch()
         .then(hits => {
             appendMarkup(hits)
+            lightbox.refresh()
         })
         .catch(() => {
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
         })
-    
-    lightbox.refresh()
 }
 
 formEl.addEventListener('submit', handleImageLoad)
 loadMoreBtnEl.addEventListener('click', handleOnLoadMore)
-
-const lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', 
-captionDelay: 250, })
