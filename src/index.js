@@ -1,4 +1,3 @@
-const axios = require('axios');
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
@@ -7,7 +6,6 @@ import ImagesApiService from './load-image';
 const formEl = document.querySelector('.search-form');
 const markupContainerEl = document.querySelector('.gallery');
 const loadMoreBtnEl = document.querySelector('.load-more');
-const totalHitsContainerEl = document.querySelector('.total-hits')
 
 const imagesApiService = new ImagesApiService();
 let lightbox;
@@ -43,7 +41,6 @@ function appendMarkup(array) {
 
     lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', 
 captionDelay: 250, })
-
 }
 
 function clearMarkup() {
@@ -58,33 +55,41 @@ function handleImageLoad(event) {
     imagesApiService.resetPage()
 
     imagesApiService.makeFetch()
-        .then(hits => {
-            if (imagesApiService.query === '') {
+        .then(data => {
+            if (imagesApiService.query.trim().length === 0) {
                 clearMarkup()
                 loadMoreBtnEl.classList.add('is-hidden')
                 return Notiflix.Notify.warning('Please enter any fetch')
-            } else {
+            }
+            else {
                 clearMarkup()
-                appendMarkup(hits)
+                appendMarkup(data.hits)
                 lightbox.refresh()
+                if (data.hits.length < 40) {
+                    loadMoreBtnEl.classList.add('is-hidden')
+                } else 
+                    {loadMoreBtnEl.classList.remove('is-hidden')}
             }  
         })
         .catch(() => {
             loadMoreBtnEl.classList.add('is-hidden')
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
         })
-    
-    loadMoreBtnEl.classList.remove('is-hidden')
 }
 
 function handleOnLoadMore() {
     imagesApiService.makeFetch()
-        .then(hits => {
-            appendMarkup(hits)
+        .then(data => {
+                     if (data.hits.length < 40) {
+        loadMoreBtnEl.classList.add('is-hidden')
+    }
+            appendMarkup(data.hits)
             lightbox.refresh()
         })
         .catch(() => {
-            Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+     
+            loadMoreBtnEl.classList.add('is-hidden')
+            Notiflix.Notify.info('We are sorry, but you have reached the end of search results.')
         })
 }
 
