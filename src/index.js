@@ -66,6 +66,7 @@ function handleImageLoad(event) {
                 appendMarkup(data.hits)
                 lightbox.refresh()
                 if (data.hits.length < 40) {
+                    Notiflix.Notify.info('We are sorry, but you have reached the end of search results.')
                     loadMoreBtnEl.classList.add('is-hidden')
                 } else 
                     {loadMoreBtnEl.classList.remove('is-hidden')}
@@ -80,16 +81,15 @@ function handleImageLoad(event) {
 function handleOnLoadMore() {
     imagesApiService.makeFetch()
         .then(data => {
-                     if (data.hits.length < 40) {
-        loadMoreBtnEl.classList.add('is-hidden')
-    }
+            if (data.hits.length < 40) {                 
+                Notiflix.Notify.info('We are sorry, but you have reached the end of search results.')
+                loadMoreBtnEl.classList.add('is-hidden')
+            }
             appendMarkup(data.hits)
             lightbox.refresh()
         })
         .catch(() => {
-     
             loadMoreBtnEl.classList.add('is-hidden')
-            Notiflix.Notify.info('We are sorry, but you have reached the end of search results.')
         })
 }
 
